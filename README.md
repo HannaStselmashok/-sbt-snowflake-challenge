@@ -76,6 +76,9 @@ database: dbt_hol_dev
 schema: public
 threads: 200
 
+Then to connect run 'dbt debug' and 'dbt run' to run sample models that comes with dbt templates by default to validate everything is set up correctly.
+You can then check these models in Snowflake account.
+
 If errors:
 - check credentials in profiles.yml
 - check that profile name in dbt_project.yml is the same as in profiles.yml
