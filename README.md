@@ -1,6 +1,8 @@
 # DBT core + Snowflake
 
-## Create dbt user, database and schema in Snowflake
+## Set up the environment
+
+### Create dbt user, database and schema in Snowflake
 
 ```sql
 -- Use an admin role
@@ -49,3 +51,31 @@ As result of these steps, we should have:
 - two empty databases: PROD, DEV
 - two pair of virtual warehouses: two for prod, two for dev workloads
 - a pair of roles and one user
+
+### Set up virtual environment
+
+```shell
+pip install virtualenv
+virtualenv dbtsnowflake
+dbtsnowflake\Scripts\activate
+```
+
+### Install dbt
+```shell
+pip install dbt-snowflake==1.7.2
+dbt init dbt_hol
+cd dbt_hol
+```
+
+account: lkhpmcc-cn69015
+user: dbt
+password: dbtPassword123
+role: dbt_dev_role
+warehouse: dbt_dev_wh
+database: dbt_hol_dev
+schema: public
+threads: 200
+
+If errors:
+- check credentials in profiles.yml
+- check that profile name in dbt_project.yml is the same as in profiles.yml
