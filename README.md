@@ -85,3 +85,67 @@ If errors:
 
 ## Connect to data source
 
+Here is the [data set](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/cybersyn-inc-financial-economic-essentials?available=installed) I'm using for this project.
+
+In the pop-up, leave the database name as proposed by default (important!), check the "I accept..." box and then add PUBLIC role to the additional roles.
+
+## Build DBT data pipelines
+
+1. Create separate folders for models, representing logical levels in the pipelins
+
+```shell
+mkdir models/l10_staging
+mkdir models/l20_transform
+mkdir models/l30_mart
+mkdir models/tests
+```
+
+2. Modify dbt_project.yml file to reflect model structure
+
+```yaml
+models:
+  dbt_hol:
+      # Applies to all files under models/example/
+      example:
+          materialized: view
+          +enabled: false
+      l10_staging:
+          schema: l10_staging
+          materialized: view
+      l20_transform:
+          schema: l20_transform
+          materialized: view
+      l30_mart:
+          schema: l30_mart
+          materialized: view
+```
+
+3. Custom schema name. By default dbt generated a schema name by appending it to the target schema env name (dev, prod). To make the names between dev and prod databases the same, we need to create sql file in macros schema_name.sql and place this jinja script there.
+
+```sql
+{% macro generate_schema_name(custom_schema_name, node) -%}
+    {%- set default_schema = target.schema -%}
+    {%- if custom_schema_name is none -%}
+        {{ default_schema }}
+    {%- else -%}
+        {{ custom_schema_name | trim }}
+    {%- endif -%}
+{%- endmacro %}
+
+
+{% macro set_query_tag() -%}
+  {% set new_query_tag = model.name %} {# always use model name #}
+  {% if new_query_tag %}
+    {% set original_query_tag = get_current_query_tag() %}
+    {{ log("Setting query_tag to '" ~ new_query_tag ~ "'. Will reset to '" ~ original_query_tag ~ "' after materialization.") }}
+    {% do run_query("alter session set query_tag = '{}'".format(new_query_tag)) %}
+    {{ return(original_query_tag)}}
+  {% endif %}
+  {{ return(none)}}
+{% endmacro %}
+```
+
+There is another macro overridden in the file: set_query_tag(). This one provides the ability to add additional level of transparency by automatically setting Snowflake query_tag to the name of the model it associated with.
+
+So if you go in Snowflake UI and click ‘History' icon on top, you are going to see all SQL queries run on Snowflake account(successful, failed, running etc) and clearly see what dbt model this particular query is related to.
+
