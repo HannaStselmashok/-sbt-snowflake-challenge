@@ -35,8 +35,8 @@ GRANT ALL ON WAREHOUSE dbt_dev_heavy_wh  TO ROLE dbt_dev_role;
 GRANT ALL ON WAREHOUSE dbt_prod_wh TO ROLE dbt_prod_role;
 GRANT ALL ON WAREHOUSE dbt_prod_heavy_wh  TO ROLE dbt_prod_role;
 
-CREATE OR REPLACE DATABASE dbt_hol_dev; 
-CREATE OR REPLACE DATABASE dbt_hol_prod; 
+CREATE OR REPLACE DATABASE dbt_hol_dev;
+CREATE OR REPLACE DATABASE dbt_hol_prod;
 CREATE OR REPLACE SCHEMA  dbt_hol_dev;
 CREATE OR REPLACE SCHEMA  dbt_hol_prod;
 
@@ -69,7 +69,7 @@ cd dbt_hol
 
 - account: lkhpmcc-cn69015
 - user: dbt
-- password: dbtPassword123 
+- password: dbtPassword123
 - role: dbt_dev_role
 - warehouse: dbt_dev_wh
 - database: dbt_hol_dev
@@ -149,3 +149,12 @@ There is another macro overridden in the file: set_query_tag(). This one provide
 
 So if you go in Snowflake UI and click ‘History' icon on top, you are going to see all SQL queries run on Snowflake account(successful, failed, running etc) and clearly see what dbt model this particular query is related to.
 
+4. DBT plugins. Let's install dbt package dbt_utils. For that create packages.yml file in the root of dbt project folder.
+
+```yaml
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+```
+
+Run `dbt deps` to install the package.
